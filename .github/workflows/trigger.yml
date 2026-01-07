@@ -1,0 +1,21 @@
+name: Trigger Vercel Cron V3
+on:
+  workflow_dispatch:
+  schedule:
+    - cron: '0 * * * *' # Every hour
+jobs:
+  trigger:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Hit Vercel Endpoint
+        env:
+          CRON_URL: ${{ secrets.CRON_URL }}
+        run: |
+          if [ -z "$CRON_URL" ]; then
+            echo "ERROR: CRON_URL secret not found!"
+            exit 1
+          fi
+          # Ensuring endpoint is called correctly
+          TARGET_URL="${CRON_URL%/}/api/cron"
+          curl -m 30 -X GET "$TARGET_URL"
+          echo "Successfully triggered at $(date)"
